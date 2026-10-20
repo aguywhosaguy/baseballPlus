@@ -13,7 +13,6 @@ export const brefButton = (ctx: ContentScriptContext) => {
     anchor: '[class*="header_player-name"] > h1',
     append: (anchor, root) => anchor.after(root),
     onMount: (container) => {
-      console.log(container)
       const id = location.pathname.match(/^\/players\/[^/]+\/([^/]+)/)?.[1]
 
       const name = document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.innerHTML
