@@ -16,7 +16,7 @@ export const brefButtons = (ctx: ContentScriptContext) => {
 
         if (!name || !id) return;
 
-        container.append(...(await buttons(name, id, PlayerID.BRef)))
+        container.append(await buttons(name, id, PlayerID.BRef))
       } catch (e) {
         console.error(e)
       }

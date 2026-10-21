@@ -1,3 +1,3 @@
 # Baseball+
 
-Adds cool stuff to fangraphs and bref. WIP.
+Adds cool stuff to various baseball websites. WIP.

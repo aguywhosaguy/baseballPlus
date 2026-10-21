@@ -21,7 +21,7 @@ export const fgButtons = (ctx: ContentScriptContext) => {
 
         if (!name || !id) return;
 
-        container.append(...(await buttons(name, id, PlayerID.FanGraphs)))
+        container.append(await buttons(name, id, PlayerID.FanGraphs))
       } catch (e) {
         console.error(e)
       }

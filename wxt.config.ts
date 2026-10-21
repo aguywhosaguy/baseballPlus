@@ -12,7 +12,8 @@ export default defineConfig({
       {
         matches: [
           "*://*.baseball-reference.com/*",
-          "*://*.fangraphs.com/*"
+          "*://*.fangraphs.com/*",
+          "*://baseballsavant.mlb.com/*"
         ],
         resources: [
           'data.json'
