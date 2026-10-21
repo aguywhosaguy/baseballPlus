@@ -1,8 +1,8 @@
-import { fangraphsButton } from "./features/fgbutton";
+import { brefButtons } from "./features/brefbuttons";
 
 export default defineContentScript({
   matches: ['*://*.baseball-reference.com/*'],
   main(ctx) {
-    fangraphsButton(ctx)
+    brefButtons(ctx)
   }
 });

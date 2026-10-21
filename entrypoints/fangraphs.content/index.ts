@@ -1,8 +1,8 @@
-import { brefButton } from "./features/brefbutton";
+import { fgButtons } from "./features/fgbuttons";
 
  export default defineContentScript({
   matches: ['*://*.fangraphs.com/*'],
   main(ctx) {
-    brefButton(ctx)
+    fgButtons(ctx)
   }
 });
