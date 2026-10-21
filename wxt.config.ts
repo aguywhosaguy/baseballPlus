@@ -7,6 +7,17 @@ export default defineConfig({
     host_permissions: [
       "https://github.com/*",
       "https://*.githubusercontent.com/*"
+    ],
+    web_accessible_resources: [
+      {
+        matches: [
+          "*://*.baseball-reference.com/*",
+          "*://*.fangraphs.com/*"
+        ],
+        resources: [
+          'data.json'
+        ]
+      }
     ]
   }
 });

@@ -1,4 +1,4 @@
-import { getMaps } from "@/utils/data"
+import { findPlayer, PlayerID } from "@/utils/data"
 import fgicon from "@/assets/fangraphs.png?inline"
 import type { ContentScriptContext } from '#imports';
 
@@ -27,10 +27,10 @@ export const fangraphsButton = (ctx: ContentScriptContext) => {
       container.append(link)
 
       if (id) {
-        getMaps().then(({ bbToFg }) => {
-          const fg = bbToFg.get(id)
-          if (fg) {
-            link.href = FG + "players/" + name.replace(" ", "-") + "/" + fg
+        findPlayer(id, PlayerID.BRef).then((player) => {
+          console.log(player)
+          if (player) {
+            link.href = FG + "players/" + name.replace(" ", "-") + "/" + player[PlayerID.FanGraphs]
           }
         })
       }

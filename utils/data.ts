@@ -6,16 +6,19 @@ export const DATA_URL =
 const SUPPORTED_SCHEMA = 1;
 const STALE_AFTER_MS = 20 * 60 * 60 * 1000;
 
+export type Player = [string, string]
+
+export enum PlayerID {
+  FanGraphs,
+  BRef,
+
+}
+
 export interface DataFile {
   schemaVersion: number;
   generatedAt: string;
   upstreamCommit: string;
-  pairs: [string, string][];
-}
-
-export interface Maps {
-  fgToBb: Map<string, string>;
-  bbToFg: Map<string, string>;
+  pairs: Player[];
 }
 
 const storedData = storage.defineItem<DataFile | null>('local:data', {
@@ -44,28 +47,12 @@ async function loadBundled(): Promise<DataFile> {
   return res.json();
 }
 
-function buildMaps(d: DataFile): Maps {
-  const fgToBb = new Map<string, string>();
-  const bbToFg = new Map<string, string>();
-  for (const [fg, bb] of d.pairs) {
-    fgToBb.set(fg, bb);
-    bbToFg.set(bb, fg);
-  }
-  return { fgToBb, bbToFg };
-}
-
-let cache: Maps | null = null;
-// Rebuild the maps in this context whenever the stored data changes.
-storedData.watch(() => {
-  cache = null;
-});
-
-/** Used by content scripts and the background. Never touches the network. */
-export async function getMaps(): Promise<Maps> {
-  if (cache) return cache;
+export async function findPlayer(id: string, type: PlayerID): Promise<Player | undefined> {
   const data = (await storedData.getValue()) ?? (await loadBundled());
-  cache = buildMaps(data);
-  return cache;
+
+  const player = data.pairs.find(r => r[type] === id)
+
+  return player;
 }
 
 export async function seedFromBundled(): Promise<void> {

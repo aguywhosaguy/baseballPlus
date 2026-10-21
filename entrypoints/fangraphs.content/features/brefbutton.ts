@@ -1,4 +1,4 @@
-import { getMaps } from "@/utils/data"
+import { findPlayer, PlayerID } from "@/utils/data"
 import breficon from '@/assets/bref.png?inline'
 import type { ContentScriptContext } from '#imports';
 
@@ -32,10 +32,9 @@ export const brefButton = (ctx: ContentScriptContext) => {
       container.append(link)
 
       if (id) {
-        getMaps().then(({ fgToBb }) => {
-          const bb = fgToBb.get(id)
-          if (bb) {
-            link.href = BREF + "players/" + bb[0] + "/" + bb + ".shtml"
+        findPlayer(id, PlayerID.FanGraphs).then((player) => {
+          if (player) {
+            link.href = BREF + "players/" + player[PlayerID.BRef][0] + "/" + player[PlayerID.BRef] + ".shtml"
           }
         })
       }
