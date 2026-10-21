@@ -1,4 +1,4 @@
-import { PlayerID } from "@/utils/data"
+import { PlayerID, Site } from "@/utils/data"
 import type { ContentScriptContext } from '#imports';
 import { buttons } from "@/utils/components/buttons";
 
@@ -9,6 +9,8 @@ const TIMEOUT = 300
 export const fgButtons = (ctx: ContentScriptContext) => {
   if (!location.pathname.match(/^\/players\//)) return
 
+  let name = document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.textContent.trim()
+
   const ui = createIntegratedUi(ctx, {
     position: "inline",
     anchor: '[class*="header_player-name"] > h1',
@@ -17,11 +19,11 @@ export const fgButtons = (ctx: ContentScriptContext) => {
       try {
         const id = location.pathname.match(/^\/players\/[^/]+\/([^/]+)/)?.[1]
 
-        const name = document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.innerHTML
-
         if (!name || !id) return;
 
-        container.append(await buttons(name, id, PlayerID.FanGraphs))
+        console.log(name)
+
+        container.append(await buttons(name, id, PlayerID.FanGraphs, Site.FanGraphs))
       } catch (e) {
         console.error(e)
       }
@@ -30,9 +32,12 @@ export const fgButtons = (ctx: ContentScriptContext) => {
 
   ui.autoMount()
 
-  ctx.addEventListener(window, 'wxt:locationchange', () => {
+  ctx.addEventListener(window, 'wxt:locationchange', async () => {
     ui.remove();
-    clearTimeout(timer)
-    timer = ctx.setTimeout(() => ui.mount(), TIMEOUT);
+    while (document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.textContent.trim() === name) {
+      await new Promise((r) => setTimeout(r, 50))
+    }
+    name = document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.textContent?.trim() || ''
+    ui.mount()
   });
 }

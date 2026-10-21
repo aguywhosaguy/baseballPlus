@@ -12,7 +12,12 @@ export enum PlayerID {
   MLB,
   FanGraphs,
   BRef,
+}
 
+export enum Site {
+  Savant,
+  FanGraphs,
+  BRef
 }
 
 export interface DataFile {
