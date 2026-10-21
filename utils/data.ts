@@ -3,12 +3,13 @@ import { storage } from '#imports';
 export const DATA_URL =
   'https://github.com/aguywhosaguy/chadwickCharts/releases/download/latest/data.json';
 
-const SUPPORTED_SCHEMA = 1;
+const SUPPORTED_SCHEMA = 2;
 const STALE_AFTER_MS = 20 * 60 * 60 * 1000;
 
-export type Player = [string, string]
+export type Player = [string, string, string]
 
 export enum PlayerID {
+  MLB,
   FanGraphs,
   BRef,
 
@@ -18,7 +19,7 @@ export interface DataFile {
   schemaVersion: number;
   generatedAt: string;
   upstreamCommit: string;
-  pairs: Player[];
+  players: Player[];
 }
 
 const storedData = storage.defineItem<DataFile | null>('local:data', {
@@ -35,8 +36,8 @@ function isValid(d: any): d is DataFile {
   return (
     d &&
     d.schemaVersion === SUPPORTED_SCHEMA &&
-    Array.isArray(d.pairs) &&
-    d.pairs.length > 0 &&
+    Array.isArray(d.players) &&
+    d.players.length > 0 &&
     typeof d.generatedAt === 'string' &&
     typeof d.upstreamCommit === 'string'
   );
@@ -50,7 +51,7 @@ async function loadBundled(): Promise<DataFile> {
 export async function findPlayer(id: string, type: PlayerID): Promise<Player | undefined> {
   const data = (await storedData.getValue()) ?? (await loadBundled());
 
-  const player = data.pairs.find(r => r[type] === id)
+  const player = data.players.find(r => r[type] === id)
 
   return player;
 }
@@ -100,7 +101,7 @@ export async function refreshData(): Promise<void> {
   }
 
   // Refuse a suspiciously smaller file; keep the known-good copy.
-  if (current && data.pairs.length < current.pairs.length * 0.8) return;
+  if (current && data.players.length < current.players.length * 0.8) return;
 
   await storedData.setValue(data);
   await storedEtag.setValue(res.headers.get('etag'));
