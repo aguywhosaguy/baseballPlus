@@ -1,10 +1,6 @@
-import { PlayerID, Site } from "@/utils/data"
+import { PlayerID, Site } from "@/utils/types"
 import type { ContentScriptContext } from '#imports';
 import { buttons } from "@/utils/components/buttons";
-
-let timer: number | undefined;
-
-const TIMEOUT = 300
 
 const getName = () =>
   document.querySelector('[class*="header_player-name"] > h1')?.textContent?.trim()
@@ -27,7 +23,7 @@ export const fgButtons = (ctx: ContentScriptContext) => {
         if (!name || !id) return;
 
         mounted = { id, name }
-        container.append(await buttons(name, id, PlayerID.FanGraphs, Site.FanGraphs))
+        container.append(await buttons(name, id, Site.FanGraphs))
       } catch (e) {
         console.error(e)
       }

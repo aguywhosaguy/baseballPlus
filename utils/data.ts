@@ -1,4 +1,6 @@
 import { storage } from '#imports';
+import { type DataFile } from './types';
+
 
 export const DATA_URL =
   'https://github.com/aguywhosaguy/chadwickCharts/releases/download/latest/data.json';
@@ -6,26 +8,6 @@ export const DATA_URL =
 const SUPPORTED_SCHEMA = 2;
 const STALE_AFTER_MS = 20 * 60 * 60 * 1000;
 
-export type Player = [string, string, string]
-
-export enum PlayerID {
-  MLB,
-  FanGraphs,
-  BRef,
-}
-
-export enum Site {
-  Savant,
-  FanGraphs,
-  BRef
-}
-
-export interface DataFile {
-  schemaVersion: number;
-  generatedAt: string;
-  upstreamCommit: string;
-  players: Player[];
-}
 
 const storedData = storage.defineItem<DataFile | null>('local:data', {
   fallback: null,

@@ -1,4 +1,4 @@
-import { PlayerID, Site } from "@/utils/data"
+import { PlayerID, Site } from "@/utils/types"
 import { type ContentScriptContext } from '#imports';
 import { buttons } from "@/utils/components/buttons";
 
@@ -16,7 +16,7 @@ export const brefButtons = (ctx: ContentScriptContext) => {
 
         if (!name || !id) return;
 
-        container.append(await buttons(name, id, PlayerID.BRef, Site.BRef))
+        container.append(await buttons(name, id, Site.BRef))
       } catch (e) {
         console.error(e)
       }

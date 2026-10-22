@@ -1,43 +1,6 @@
-import { findPlayer, PlayerID, Site } from "@/utils/data"
-import breficon from '@/assets/buttons/bref.png?inline'
-import fgicon from '@/assets/buttons/fangraphs.png?inline'
-import savanticon from '@/assets/buttons/savant.png?inline'
-
-const BREF = "https://www.baseball-reference.com/"
-const FG = "https://www.fangraphs.com/"
-const SAVANT = "https://baseballsavant.mlb.com/"
-
-type Button = {
-  site: Site
-  idtype: PlayerID
-  icon: string
-  player: (id: string, name: string) => string
-  search: (name: string) => string
-}
-
-const BUTTONS: Button[] = [
-  {
-    site: Site.BRef,
-    idtype: PlayerID.BRef,
-    icon: breficon,
-    player: (id: string, name: string) => `${BREF}players/${id[0]}/${id}.shtml`,
-    search: (name: string) => `${BREF}search/search.fcgi?hint=&search=${encodeURIComponent(name)}`,
-  },
-  {
-    site: Site.FanGraphs,
-    idtype: PlayerID.FanGraphs,
-    icon: fgicon,
-    player: (id: string, name: string) => `https://www.fangraphs.com/players/${name.replaceAll(" ", "-").toLowerCase()}/${id}`,
-    search: (name: string) => `https://www.fangraphs.com/search?q=${encodeURIComponent(name)}`,
-  },
-  {
-    site: Site.Savant,
-    idtype: PlayerID.MLB,
-    icon: savanticon,
-    player: (id: string, name: string) => `${SAVANT}savant-player/${name.replaceAll(" ", "-").toLowerCase()}-${id}`,
-    search: (name: string) => SAVANT
-  }
-]
+import { findPlayer } from "@/utils/data"
+import type { Site } from "../types"
+import { SITES } from "../constants"
 
 const button = (href: string, img: string): HTMLAnchorElement => {
   const link = document.createElement('a')
@@ -53,18 +16,20 @@ const button = (href: string, img: string): HTMLAnchorElement => {
   return link
 }
 
-export const buttons = async (name: string, id: string | undefined, idtype: PlayerID, site: Site): Promise<HTMLDivElement> =>  {
-  const player = id ? await findPlayer(id, idtype) : undefined
+export const buttons = async (name: string, id: string | undefined, site: Site): Promise<HTMLDivElement> =>  {
+  const sitedata = SITES[site]
+
+  const player = id ? await findPlayer(id, sitedata.idtype) : undefined
 
   const container = document.createElement('div')
   container.style.display = 'inline-flex'
   container.style.gap = '4px'
 
-  BUTTONS
-    .filter((s) => s.site !== site)
+  Object.entries(SITES)
+    .filter(([key]) => key !== site)
     .forEach((s) => {
-      const siteID = player?.[s.idtype]
-      container.append(button(siteID ? s.player(siteID, name) : s.search(name), s.icon))
+      const siteID = player?.[s[1].idtype]
+      container.append(button(siteID ? s[1].player(siteID, name) : s[1].search(name), s[1].icon))
     })
 
   return container
