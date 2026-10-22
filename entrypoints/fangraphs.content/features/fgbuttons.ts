@@ -6,10 +6,14 @@ let timer: number | undefined;
 
 const TIMEOUT = 300
 
-export const fgButtons = (ctx: ContentScriptContext) => {
-  if (!location.pathname.match(/^\/players\//)) return
+const getName = () =>
+  document.querySelector('[class*="header_player-name"] > h1')?.textContent?.trim()
 
-  let name = document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.textContent.trim()
+const getId = () =>
+  location.pathname.match(/^\/players\/[^/]+\/([^/]+)/)?.[1]
+
+export const fgButtons = (ctx: ContentScriptContext) => {
+  let mounted: { id: string; name: string } | undefined
 
   const ui = createIntegratedUi(ctx, {
     position: "inline",
@@ -17,27 +21,37 @@ export const fgButtons = (ctx: ContentScriptContext) => {
     append: (anchor, root) => anchor.after(root),
     onMount: async (container) => {
       try {
-        const id = location.pathname.match(/^\/players\/[^/]+\/([^/]+)/)?.[1]
+        const name = getName()
+        const id = getId()
 
         if (!name || !id) return;
 
-        console.log(name)
-
+        mounted = { id, name }
         container.append(await buttons(name, id, PlayerID.FanGraphs, Site.FanGraphs))
       } catch (e) {
         console.error(e)
       }
-    }
+    },
+    onRemove: () => { mounted = undefined }
   })
 
-  ui.autoMount()
+  ctx.setInterval(() => {
+    const id = getId()
+    const name = getName()
 
-  ctx.addEventListener(window, 'wxt:locationchange', async () => {
-    ui.remove();
-    while (document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.textContent.trim() === name) {
-      await new Promise((r) => setTimeout(r, 50))
+    if (!id) {
+      if (ui.mounted) ui.remove()
+      return
     }
-    name = document.querySelector('[class*="header_player-name"]')?.querySelector('h1')?.textContent?.trim() || ''
+
+    if (!name) return
+
+    if (mounted?.id === id && ui.mounted && ui.wrapper.isConnected) return
+
+    if (mounted && mounted.id !== id && mounted.name === name) return
+
+    if (ui.mounted) ui.remove()
+
     ui.mount()
-  });
+  }, 400);
 }
