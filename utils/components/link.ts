@@ -34,6 +34,8 @@ export const link = (ctx: ContentScriptContext, site: Site) => {
 
     for (const hsite of Object.entries(SITES)) {
       if (key === (hsite[1].hotkey)) {
+        a.classList.add('BP_modified')
+
         const player = await findPlayer(id[1], csite.idtype)
 
         if (!player) {
@@ -55,16 +57,13 @@ export const link = (ctx: ContentScriptContext, site: Site) => {
     if (!unlink) return
 
     unlink.link.href = unlink.href
+    unlink.link.classList.remove('BP_modified')
 
     delete links[key]
   }, true)
   ctx.addEventListener(window, 'blur', () => { links = {} })
   ctx.addEventListener(window, 'click', (e) => {
-    const hovered = document.querySelectorAll('a:hover')
-
-    const a = hovered[hovered.length - 1] as HTMLAnchorElement
-
-    if (!a) return
+    if (!document.querySelector('.BP_modified')) return
 
     if (e.button !== 0 || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
 
